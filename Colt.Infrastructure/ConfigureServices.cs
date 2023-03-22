@@ -4,6 +4,8 @@ using Colt.Infrastructure.Persistance;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Colt.Domain.Repositories;
+using Colt.Infrastructure.Repositories;
 
 namespace Colt.Infrastructure
 {
@@ -18,6 +20,9 @@ namespace Colt.Infrastructure
                         builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
             services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
+            services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<ICustomerRepository, CustomerRepository>();
 
             return services;
         }

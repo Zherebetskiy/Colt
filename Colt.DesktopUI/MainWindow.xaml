@@ -5,8 +5,51 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Colt.DesktopUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
-
+        <TabControl>
+            <TabItem Header="Home" FontSize="20">
+                <Grid>
+                    <TextBlock Text="This is Tab 1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Products" FontSize="20">
+                <StackPanel Height="Auto">
+                    <DataGrid x:Name="DataGridProducts" AutoGenerateColumns="False"
+                      CanUserAddRows="False" Height="200" Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Visibility="Hidden"/>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" Width="200"  IsReadOnly="True"/>
+                            <DataGridTemplateColumn Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Edit" x:Name="ButtonEditProduct" 
+                                        Click="ButtonEditProduct_OnClick"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Delete" x:Name="ButtonDeleteProduct"
+                                        Click="ButtonDeleteProduct_OnClick"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Customers" FontSize="20">
+                <Grid>
+                    <TextBlock Text="This is Tab 3" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Orders" FontSize="20">
+                <Grid>
+                    <TextBlock Text="This is Tab 3" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

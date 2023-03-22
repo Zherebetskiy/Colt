@@ -10,9 +10,14 @@ namespace Colt.Infrastructure.Persistance
     {
         private readonly AuditableEntitySaveChangesInterceptor _auditableEntitySaveChangesInterceptor;
 
+        public ApplicationDbContext() : base()
+        {
+
+        }
+
         public ApplicationDbContext(
-            DbContextOptions<ApplicationDbContext> options,
-            AuditableEntitySaveChangesInterceptor auditableEntitySaveChangesInterceptor)
+            DbContextOptions<ApplicationDbContext> options, AuditableEntitySaveChangesInterceptor auditableEntitySaveChangesInterceptor
+            )
             : base(options)
         {
             _auditableEntitySaveChangesInterceptor = auditableEntitySaveChangesInterceptor;
@@ -32,6 +37,11 @@ namespace Colt.Infrastructure.Persistance
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=Colt;TrustServerCertificate=True; Integrated Security=True;");
+            }
+
             optionsBuilder.AddInterceptors(_auditableEntitySaveChangesInterceptor);
         }
     }

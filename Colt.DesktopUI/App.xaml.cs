@@ -3,6 +3,7 @@ using Colt.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Configuration;
 using System.IO;
 using System.Windows;
 
@@ -32,6 +33,7 @@ namespace Colt.DesktopUI
         private void ConfigureServices(ServiceCollection services)
         {
             services.AddApplicationServices();
+
             services.AddInfrastructureServices(_configuration);
 
             services.AddSingleton<MainWindow>();

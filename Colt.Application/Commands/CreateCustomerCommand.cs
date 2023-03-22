@@ -2,6 +2,7 @@
 using Colt.Application.Common.Models;
 using Colt.Domain.Common;
 using Colt.Domain.Entities;
+using Colt.Domain.Repositories;
 using MediatR;
 
 namespace Colt.Application.Commands
@@ -13,14 +14,14 @@ namespace Colt.Application.Commands
 
     public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerCommand, CustomerDto>
     {
-        private readonly IApplicationDbContext _context;
+        private readonly ICustomerRepository _repository;
         private readonly IMapper _mapper;
 
         public CreateCustomerCommandHandler(
-            IApplicationDbContext context,
+            ICustomerRepository repository,
             IMapper mapper)
         {
-            _context = context;
+            _repository = repository;
             _mapper = mapper;
         }
 
@@ -31,9 +32,7 @@ namespace Colt.Application.Commands
                 Name = request.Name
             };
 
-            await _context.Customers.AddAsync(customer, cancellationToken);
-
-            await _context.SaveChangesAsync(cancellationToken);
+            await _repository.AddAsync(customer, cancellationToken);
 
             return _mapper.Map<CustomerDto>(customer);
         }
