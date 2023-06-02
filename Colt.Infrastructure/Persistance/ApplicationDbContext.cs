@@ -2,6 +2,7 @@
 using Colt.Domain.Entities;
 using Colt.Infrastructure.Persistance.Interceptors;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Reflection;
 
 namespace Colt.Infrastructure.Persistance
@@ -27,6 +28,16 @@ namespace Colt.Infrastructure.Persistance
         public DbSet<Product> Products { get; set; }
         public DbSet<CustomerProduct> CustomerProducts { get; set; }
         public DbSet<Order> Orders { get; set; }
+
+        public DbSet<TEntity> GetSet<TEntity>() where TEntity : BaseEntity<int>
+        {
+            return base.Set<TEntity>();
+        }
+
+        public EntityEntry GetEntry(object entity)
+        {
+            return base.Entry(entity);
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

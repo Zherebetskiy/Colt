@@ -1,4 +1,6 @@
-﻿using Colt.Application.Queries;
+﻿using Colt.Application.Commands;
+using Colt.Application.Common.Models;
+using Colt.Application.Queries;
 using Colt.Domain.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +36,11 @@ namespace Colt.DesktopUI
             InitializeComponent();
         }
 
+        public async Task PopulateGrids()
+        {
+            DataGridProducts.ItemsSource = await _mediator.Send(new GetProductsQuery(), CancellationToken.None);
+        }
+
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             await PopulateGrids();
@@ -41,17 +48,26 @@ namespace Colt.DesktopUI
 
         private void ButtonEditProduct_OnClick(object sender, RoutedEventArgs e)
         {
+            var productDto = ((FrameworkElement)sender).DataContext as ProductDto;
 
+            var createProductWindow = new CreateProduct(_mediator, this, productDto);
+            createProductWindow.ShowDialog();
         }
 
-        private void ButtonDeleteProduct_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonDeleteProduct_OnClick(object sender, RoutedEventArgs e)
         {
+            var productDto = ((FrameworkElement)sender).DataContext as ProductDto;
 
+            await _mediator.Send(new DeleteProductCommand
+            {
+                Id = productDto.Id ?? 0
+            }, CancellationToken.None);
         }
 
-        private async Task PopulateGrids()
+        private void ButtonCreateProduct_OnClick(object sender, RoutedEventArgs e)
         {
-            DataGridProducts.ItemsSource = await _mediator.Send(new GetProductsQuery(), CancellationToken.None);
+            var createProductWindow = new CreateProduct(_mediator, this);
+            createProductWindow.ShowDialog();
         }
     }
 }

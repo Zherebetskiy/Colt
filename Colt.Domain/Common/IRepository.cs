@@ -10,6 +10,8 @@
 
         Task<TEntity> UpdateAsync(TEntity entity, CancellationToken token);
 
+        Task<bool> DeleteAsync(TEntity entity, CancellationToken token);
+
         Task<int> SaveChangesAsync(CancellationToken token);
     }
 }

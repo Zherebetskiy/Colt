@@ -14,7 +14,8 @@ namespace Colt.Infrastructure.Persistance.Configurations
 
             builder.HasOne(x => x.Customer)
                 .WithMany(x => x.Products)
-                .HasForeignKey(x => x.CustomerId);
+                .HasForeignKey(x => x.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Product)
                 .WithMany()

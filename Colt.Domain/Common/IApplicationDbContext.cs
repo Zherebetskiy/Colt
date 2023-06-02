@@ -1,5 +1,6 @@
 ﻿using Colt.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Colt.Domain.Common
 {
@@ -14,5 +15,9 @@ namespace Colt.Domain.Common
         DbSet<Order> Orders { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+
+        DbSet<TEntity> GetSet<TEntity>() where TEntity : BaseEntity<int>;
+
+        EntityEntry GetEntry(object entity);
     }
 }

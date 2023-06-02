@@ -4,7 +4,7 @@ using Colt.Domain.Entities;
 using Colt.Domain.Repositories;
 using MediatR;
 
-namespace Colt.Application.Commands
+namespace Colt.Application.Commands.Products
 {
     public class CreateProductCommand : IRequest<ProductDto>
     {

@@ -8,7 +8,10 @@ namespace Colt.Infrastructure.Persistance.Configurations
     {
         public void Configure(EntityTypeBuilder<Order> builder)
         {
-            builder.Property(x => x.Price)
+            builder.Property(x => x.OrderDate)
+                .IsRequired(true);
+
+            builder.Property(x => x.TotalPrice)
                 .IsRequired(true);
 
             builder.Property(x => x.Weight)

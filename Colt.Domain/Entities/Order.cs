@@ -4,7 +4,9 @@ namespace Colt.Domain.Entities
 {
     public class Order : BaseEntity<int>
     {
-        public DateTime OperationDate { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+
+        public DateTime OrderDate { get; set; }
 
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
@@ -14,6 +16,6 @@ namespace Colt.Domain.Entities
 
         public double Weight { get; set; }
 
-        public decimal Price { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }
