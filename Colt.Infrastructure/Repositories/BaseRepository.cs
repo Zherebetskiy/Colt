@@ -38,7 +38,9 @@ namespace Colt.Infrastructure.Repositories
 
         public virtual async Task<TEntity> UpdateAsync(TEntity entity, CancellationToken token)
         {
-            _dbContext.GetEntry(entity).State = EntityState.Modified;
+            //_dbContext.GetEntry(entity).State = EntityState.Modified;
+
+            _dbContext.GetSet<TEntity>().Update(entity);
 
             await _dbContext.SaveChangesAsync(token);
 

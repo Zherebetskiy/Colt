@@ -4,6 +4,8 @@ namespace Colt.Application.Interfaces
 {
     public interface IOrderService
     {
-        Task<CustomerDto> CreateAsync(OrderDto orderDto, CancellationToken cancellationToken);
+        Task<OrderDto> CreateAsync(OrderDto orderDto, CancellationToken cancellationToken);
+
+        Task<OrderDto> UpdateAsync(OrderDto orderDto, CancellationToken cancellationToken);
     }
 }

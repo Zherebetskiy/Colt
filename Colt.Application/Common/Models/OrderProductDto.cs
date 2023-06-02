@@ -2,6 +2,8 @@
 {
     public class OrderProductDto
     {
+        public int? Id { get; set; }
+
         public int CustomerProductId { get; set; }
 
         public decimal ProductPrice { get; set; }

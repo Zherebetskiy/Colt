@@ -17,5 +17,7 @@ namespace Colt.Domain.Entities
 
         public int? ActualItemsAmount { get; set; }
         public double? ActualItemsWeight { get; set; }
+
+        public decimal? OrderProductPrice { get; set; }
     }
 }

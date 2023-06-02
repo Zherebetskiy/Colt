@@ -10,10 +10,10 @@
 
         public int CustomerId { get; set; }
 
-        public List<OrderProductDto> Products { get; set; }
+        public List<OrderProductDto> Products { get; set; } = new List<OrderProductDto>();
 
-        public double Weight { get; set; }
+        public double? TotalWeight { get; set; }
 
-        public decimal TotalPrice { get; set; }
+        public decimal? TotalPrice { get; set; }
     }
 }
