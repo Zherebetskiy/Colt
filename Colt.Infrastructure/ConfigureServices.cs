@@ -23,6 +23,7 @@ namespace Colt.Infrastructure
 
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddTransient<ICustomerRepository, CustomerRepository>();
+            services.AddTransient<IOrderRepository, OrderRepository>();
 
             return services;
         }

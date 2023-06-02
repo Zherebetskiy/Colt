@@ -1,4 +1,4 @@
-﻿using Colt.Application.Commands.Customer;
+﻿using Colt.Application.Commands.Customers;
 using FluentValidation;
 
 namespace Colt.Application.Common.Validators

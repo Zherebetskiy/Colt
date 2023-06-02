@@ -20,7 +20,6 @@ namespace Colt.Infrastructure.Repositories
         public Task<Customer> GetWithProductsAsync(int id, CancellationToken cancellationToken)
         {
             return _dbSet
-                .Where(x => x.Id == id && !x.IsDeleted)
                 .Include(x => x.Products)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);

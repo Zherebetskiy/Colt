@@ -1,6 +1,8 @@
 ﻿using Colt.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Colt.Domain.Enums;
 
 namespace Colt.Infrastructure.Persistance.Configurations
 {
@@ -12,18 +14,23 @@ namespace Colt.Infrastructure.Persistance.Configurations
                 .IsRequired(true);
 
             builder.Property(x => x.TotalPrice)
-                .IsRequired(true);
+                .IsRequired(false);
 
-            builder.Property(x => x.Weight)
-               .IsRequired(true);
+            builder.Property(x => x.TotalWeight)
+                .IsRequired(false);
+
+            builder.Property(x => x.Status)
+                .HasConversion<EnumToStringConverter<OrderStatus>>()
+                .IsRequired(true);
 
             builder.HasOne(x => x.Customer)
                 .WithMany(x => x.Orders)
                 .HasForeignKey(x => x.CustomerId);
 
-            builder.HasOne(x => x.Product)
-                .WithMany()
-                .HasForeignKey(x => x.ProductId);
+            builder.HasMany(x => x.Products)
+                .WithOne(x => x.Order)
+                .HasForeignKey(x => x.OrderId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

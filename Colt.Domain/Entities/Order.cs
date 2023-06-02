@@ -1,4 +1,5 @@
 ﻿using Colt.Domain.Common;
+using Colt.Domain.Enums;
 
 namespace Colt.Domain.Entities
 {
@@ -11,11 +12,12 @@ namespace Colt.Domain.Entities
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
 
-        public int ProductId { get; set; }
-        public Product Product { get; set; }
+        public ICollection<OrderProduct> Products { get; set; }
 
-        public double Weight { get; set; }
+        public double? TotalWeight { get; set; }
 
-        public decimal TotalPrice { get; set; }
+        public decimal? TotalPrice { get; set; }
+
+        public OrderStatus Status { get; set; }
     }
 }

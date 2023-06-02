@@ -1,4 +1,5 @@
 ﻿using Colt.Application.Commands;
+using Colt.Application.Commands.Products;
 using Colt.Application.Common.Models;
 using Colt.Application.Queries;
 using Colt.Domain.Common;
