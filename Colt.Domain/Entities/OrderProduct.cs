@@ -10,14 +10,10 @@ namespace Colt.Domain.Entities
         public int CustomerProductId { get; set; }
         public CustomerProduct CustomerProduct { get; set; }
 
-        public decimal ProductPrice { get; set; }
+        public double? OrderedWeight { get; set; }
 
-        public int? OrderdItemsAmount { get; set; }
-        public double? OrderdItemsWeight { get; set; }
+        public double? ActualWeight { get; set; }
 
-        public int? ActualItemsAmount { get; set; }
-        public double? ActualItemsWeight { get; set; }
-
-        public decimal? OrderProductPrice { get; set; }
+        public decimal? TotalPrice { get; set; }
     }
 }

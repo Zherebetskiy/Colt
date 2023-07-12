@@ -14,19 +14,13 @@ namespace Colt.Infrastructure.Persistance.Configurations
             builder.Property(x => x.CustomerProductId)
                 .IsRequired(true);
 
-            builder.Property(x => x.ProductPrice)
+            builder.Property(x => x.TotalPrice)
                 .IsRequired(true);
 
-            builder.Property(x => x.OrderdItemsAmount)
+            builder.Property(x => x.OrderedWeight)
                .IsRequired(false);
 
-            builder.Property(x => x.OrderdItemsWeight)
-               .IsRequired(false);
-
-            builder.Property(x => x.ActualItemsAmount)
-               .IsRequired(false);
-
-            builder.Property(x => x.ActualItemsWeight)
+            builder.Property(x => x.ActualWeight)
                .IsRequired(false);
         }
     }

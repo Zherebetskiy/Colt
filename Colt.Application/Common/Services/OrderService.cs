@@ -43,17 +43,17 @@ namespace Colt.Application.Common.Services
                     throw new Exception($"CustomerProduct with id: {product.CustomerProductId} not found");
                 }
 
-                product.ProductPrice = customerProduct.Price;
+                //product.ProductPrice = customerProduct.Price;
 
-                if (product.ActualItemsWeight.HasValue)
-                {
-                    order.Status = OrderStatus.Calculated;
+                //if (product.ActualItemsWeight.HasValue)
+                //{
+                //    order.Status = OrderStatus.Calculated;
 
-                    product.OrderProductPrice = (decimal)product.ActualItemsWeight.Value * product.ProductPrice;
+                //    product.OrderProductPrice = (decimal)product.ActualItemsWeight.Value * product.ProductPrice;
 
-                    totalWeight += product.ActualItemsWeight.Value;
-                    totalPrice += product.OrderProductPrice;
-                }
+                //    totalWeight += product.ActualItemsWeight.Value;
+                //    totalPrice += product.OrderProductPrice;
+                //}
             }
 
             order.TotalWeight = totalWeight;
