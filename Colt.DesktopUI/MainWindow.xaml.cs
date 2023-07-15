@@ -1,27 +1,13 @@
-﻿using Colt.Application.Commands;
-using Colt.Application.Commands.Products;
+﻿using Colt.Application.Commands.Products;
 using Colt.Application.Common.Models;
-using Colt.Application.Common.Services;
 using Colt.Application.Interfaces;
 using Colt.Application.Queries;
-using Colt.Domain.Common;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Colt.DesktopUI
 {
@@ -31,14 +17,18 @@ namespace Colt.DesktopUI
     public partial class MainWindow : Window
     {
         private readonly IMediator _mediator;
-        private readonly ICustomerService _customerService;
+        private readonly IProductService _productService;
+        private readonly IServiceProvider _serviceProvider;
 
         public MainWindow(
             IMediator mediator,
-            ICustomerService customerService)
+            IProductService productService,
+            IServiceProvider serviceProvider)
         {
             _mediator = mediator;
-            _customerService = customerService;
+            _productService = productService;
+
+            _serviceProvider = serviceProvider;
 
             InitializeComponent();
         }
@@ -73,6 +63,8 @@ namespace Colt.DesktopUI
             {
                 Id = productDto.Id ?? 0
             }, CancellationToken.None);
+
+            await PopulateProductsGrids();
         }
 
         private void ButtonCreateProduct_OnClick(object sender, RoutedEventArgs e)
@@ -87,22 +79,41 @@ namespace Colt.DesktopUI
 
         private void ButtonCreateCustomer_OnClick(object sender, RoutedEventArgs e)
         {
+            var customerWindow = new CustomerWindow(
+                _serviceProvider,
+                _productService,
+                this);
 
+            customerWindow.ShowDialog();
         }
 
         private void ButtonEditCustomer_OnClick(object sender, RoutedEventArgs e)
         {
+            var customerDto = ((FrameworkElement)sender).DataContext as CustomerDto;
 
+            var customerWindow = new CustomerWindow(
+                _serviceProvider,
+                _productService,
+                this,
+                customerDto);
+
+            customerWindow.ShowDialog();
         }
 
-        private void ButtonDeleteCustomer_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonDeleteCustomer_OnClick(object sender, RoutedEventArgs e)
         {
+            var customer = ((FrameworkElement)sender).DataContext as CustomerDto;
 
+            await _serviceProvider.GetRequiredService<ICustomerService>()
+                .DeleteAsync(customer.Id ?? default, CancellationToken.None);
+
+            await PopulateCustomersGrids();
         }
 
         public async Task PopulateCustomersGrids()
         {
-            DataGridCustomers.ItemsSource = await _customerService.GetAsync(CancellationToken.None);
+            DataGridCustomers.ItemsSource = await _serviceProvider.GetRequiredService<ICustomerService>()
+                .GetAsync(CancellationToken.None);
         }
 
         #endregion

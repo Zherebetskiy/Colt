@@ -7,6 +7,7 @@ namespace Colt.Infrastructure.Repositories
     {
         private readonly IApplicationDbContext _dbContext;
         private readonly DbSet<TEntity> _dbSet;
+
         public BaseRepository(IApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -38,8 +39,6 @@ namespace Colt.Infrastructure.Repositories
 
         public virtual async Task<TEntity> UpdateAsync(TEntity entity, CancellationToken token)
         {
-            //_dbContext.GetEntry(entity).State = EntityState.Modified;
-
             _dbContext.GetSet<TEntity>().Update(entity);
 
             await _dbContext.SaveChangesAsync(token);

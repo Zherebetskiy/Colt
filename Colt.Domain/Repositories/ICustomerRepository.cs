@@ -10,5 +10,9 @@ namespace Colt.Domain.Repositories
         Task<bool> DeleteProductsAsync(List<CustomerProduct> products, CancellationToken cancellationToken);
 
         Task<List<CustomerProduct>> GetProductsByIdAsync(int productId, CancellationToken cancellationToken);
+
+        Task<List<CustomerProduct>> GetProductsByCustomerIdAsync(int id, CancellationToken cancellationToken);
+
+        List<CustomerProduct> GetProductsByCustomerId(int id);
     }
 }

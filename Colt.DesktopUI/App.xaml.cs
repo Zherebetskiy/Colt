@@ -37,6 +37,8 @@ namespace Colt.DesktopUI
             services.AddInfrastructureServices(_configuration);
 
             services.AddSingleton<MainWindow>();
+
+            services.AddSingleton<IServiceProvider>(sp => sp);
         }
 
         private void OnStartup(object sender, StartupEventArgs e)

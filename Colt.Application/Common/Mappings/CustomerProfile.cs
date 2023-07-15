@@ -10,6 +10,10 @@ namespace Colt.Application.Common.Mappings
         public CustomerProfile()
         {
             CreateMap<Customer, CustomerDto>(MemberList.Destination);
+            CreateMap<CustomerDto, Customer>(MemberList.Destination);
+
+            CreateMap<CustomerProduct, CustomerProductDto>(MemberList.Destination)
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(x => x.Product.Name));
 
             CreateMap<CustomerProductDto, CustomerProduct>(MemberList.Destination);
 

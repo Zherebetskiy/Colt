@@ -20,6 +20,20 @@ namespace Colt.Application.Common.Services
             _mapper = mapper;
         }
 
+        public async Task<List<CustomerProductDto>> GetProductsAsync(int id, CancellationToken cancellationToken)
+        {
+            var customerProducts = await _repository.GetProductsByCustomerIdAsync(id, cancellationToken);
+
+            return _mapper.Map<List<CustomerProductDto>>(customerProducts);
+        }
+
+        public List<CustomerProductDto> GetProducts(int id)
+        {
+            var customerProducts = _repository.GetProductsByCustomerId(id);
+
+            return _mapper.Map<List<CustomerProductDto>>(customerProducts);
+        }
+
         public async Task<CustomerDto> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             var customer = await _repository.GetByIdAsync(id, cancellationToken);
@@ -41,11 +55,19 @@ namespace Colt.Application.Common.Services
 
         public async Task<CustomerDto> CreateAsync(CustomerDto customerDto, CancellationToken cancellationToken)
         {
-            var customer = _mapper.Map<Customer>(customerDto);
+            try
+            {
+                var customer = _mapper.Map<Customer>(customerDto);
 
-            await _repository.AddAsync(customer, cancellationToken);
+                await _repository.AddAsync(customer, cancellationToken);
 
-            return _mapper.Map<CustomerDto>(customer);
+                return _mapper.Map<CustomerDto>(customer);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
         public async Task<CustomerDto> UpdateAsync(CustomerDto customerDto, CancellationToken cancellationToken)
@@ -75,6 +97,18 @@ namespace Colt.Application.Common.Services
             foreach (var product in productsToAdd)
             {
                 customer.Products.Add(product);   
+            }
+
+            foreach (var product in customer.Products)
+            {
+                var productDto = customerDto.Products.FirstOrDefault(x => x.Id == product.Id);
+
+                if (productDto == null)
+                {
+                    continue;
+                }
+
+                product.Price = productDto.Price;
             }
 
             await _repository.UpdateAsync(customer, cancellationToken);
