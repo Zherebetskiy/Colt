@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
+using Colt.Application.Common.Exceptions;
 using Colt.Application.Common.Models;
 using Colt.Application.Interfaces;
-using Colt.Domain.Common;
 using Colt.Domain.Entities;
 using Colt.Domain.Enums;
 using Colt.Domain.Repositories;
-using MediatR;
 
 namespace Colt.Application.Common.Services
 {
@@ -21,8 +20,27 @@ namespace Colt.Application.Common.Services
             IMapper mapper)
         {
             _orderRepository = orderRepository;
-            _customerRepository= customerRepository;
+            _customerRepository = customerRepository;
             _mapper = mapper;
+        }
+
+        public async Task<OrderDto> GetByIdAsync(int id, CancellationToken cancellationToken)
+        {
+            var order = await _orderRepository.GetByIdAsync(id, cancellationToken);
+
+            if (order is null)
+            {
+                throw new ValidationException("Order not found");
+            }
+
+            return _mapper.Map<OrderDto>(order);
+        }
+
+        public async Task<List<OrderDto>> GetAsync(CancellationToken cancellationToken)
+        {
+            var orders = await _orderRepository.GetAsync(cancellationToken);
+
+            return _mapper.Map<List<OrderDto>>(orders);
         }
 
         public async Task<OrderDto> CreateAsync(OrderDto orderDto, CancellationToken cancellationToken)
@@ -34,26 +52,26 @@ namespace Colt.Application.Common.Services
             double? totalWeight = null;
             decimal? totalPrice = null;
 
+            order.Status = OrderStatus.Created;
+
             foreach (var product in order.Products)
             {
                 var customerProduct = customer.Products.FirstOrDefault(x => x.Id == product.CustomerProductId);
 
                 if (customerProduct == null)
                 {
-                    throw new Exception($"CustomerProduct with id: {product.CustomerProductId} not found");
+                    throw new ValidationException($"CustomerProduct with id: {product.CustomerProductId} not found");
                 }
 
-                //product.ProductPrice = customerProduct.Price;
+                if (product.ActualWeight.HasValue)
+                {
+                    order.Status = OrderStatus.Calculated;
 
-                //if (product.ActualItemsWeight.HasValue)
-                //{
-                //    order.Status = OrderStatus.Calculated;
+                    product.TotalPrice = (decimal)product.ActualWeight.Value * customerProduct.Price;
 
-                //    product.OrderProductPrice = (decimal)product.ActualItemsWeight.Value * product.ProductPrice;
-
-                //    totalWeight += product.ActualItemsWeight.Value;
-                //    totalPrice += product.OrderProductPrice;
-                //}
+                    totalWeight += product.ActualWeight.Value;
+                    totalPrice += product.TotalPrice;
+                }
             }
 
             order.TotalWeight = totalWeight;
@@ -66,6 +84,11 @@ namespace Colt.Application.Common.Services
 
         public async Task<OrderDto> UpdateAsync(OrderDto orderDto, CancellationToken cancellationToken)
         {
+            if (!orderDto.Id.HasValue)
+            {
+                throw new ValidationException($"Order has no id");
+            }
+
             var order = await _orderRepository.GetByIdAsync(orderDto.Id.Value, cancellationToken);
 
             var productIds = orderDto.Products
@@ -84,12 +107,27 @@ namespace Colt.Application.Common.Services
                 .Where(x => !x.Id.HasValue)
                 .ToList();
 
-            //TODO continue from here
+            var createdProducts = _mapper.Map<List<OrderProduct>>(createdProductsDto);
 
+            createdProducts.ForEach(x => order.Products.Add(x));
 
-            await _orderRepository.AddAsync(order, cancellationToken);
+            await _orderRepository.UpdateAsync(order, cancellationToken);
 
             return _mapper.Map<OrderDto>(order);
+        }
+
+        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
+        {
+            var order = await _orderRepository.GetByIdAsync(id, cancellationToken);
+
+            if (order is null)
+            {
+                throw new ValidationException("Order not found");
+            }
+
+            await _orderRepository.DeleteAsync(order, cancellationToken);
+
+            return true;
         }
     }
 }

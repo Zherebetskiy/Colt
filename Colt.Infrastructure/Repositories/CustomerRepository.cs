@@ -33,5 +33,13 @@ namespace Colt.Infrastructure.Repositories
 
             return true;
         }
+
+        public Task<List<CustomerProduct>> GetProductsByIdAsync(int productId, CancellationToken cancellationToken)
+        {
+            return _dbContext.GetSet<CustomerProduct>()
+                .Where(x => x.ProductId == productId)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
     }
 }

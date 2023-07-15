@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Colt.Application.Commands.Customers;
+using Colt.Application.Common.Exceptions;
 using Colt.Application.Common.Models;
 using Colt.Application.Interfaces;
 using Colt.Domain.Entities;
@@ -20,22 +20,41 @@ namespace Colt.Application.Common.Services
             _mapper = mapper;
         }
 
-        public async Task<CustomerDto> CreateAsync(CreateCustomerCommand request, CancellationToken cancellationToken)
+        public async Task<CustomerDto> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var customer = _mapper.Map<Customer>(request);
+            var customer = await _repository.GetByIdAsync(id, cancellationToken);
+
+            if (customer is null)
+            {
+                throw new ValidationException("Product not found");
+            }
+
+            return _mapper.Map<CustomerDto>(customer);
+        }
+
+        public async Task<List<CustomerDto>> GetAsync(CancellationToken cancellationToken)
+        {
+            var customers = await _repository.GetAsync(cancellationToken);
+
+            return _mapper.Map<List<CustomerDto>>(customers);
+        }
+
+        public async Task<CustomerDto> CreateAsync(CustomerDto customerDto, CancellationToken cancellationToken)
+        {
+            var customer = _mapper.Map<Customer>(customerDto);
 
             await _repository.AddAsync(customer, cancellationToken);
 
             return _mapper.Map<CustomerDto>(customer);
         }
 
-        public async Task<CustomerDto> UpdateAsync(UpdateCustomerCommand request, CancellationToken cancellationToken)
+        public async Task<CustomerDto> UpdateAsync(CustomerDto customerDto, CancellationToken cancellationToken)
         {
-            var customer = await _repository.GetWithProductsAsync(request.Id, cancellationToken);
+            var customer = await _repository.GetWithProductsAsync(customerDto.Id.Value, cancellationToken);
 
-            customer.Name = request.Name;
+            customer.Name = customerDto.Name;
 
-            var productIds = request.Products
+            var productIds = customerDto.Products
                 .Where(x => x.Id.HasValue)
                 .Select(x => x.ProductId)
                 .ToList();
@@ -47,7 +66,7 @@ namespace Colt.Application.Common.Services
 
             await _repository.DeleteProductsAsync(deletedProducts, cancellationToken);
 
-            var createdProductsDto = request.Products
+            var createdProductsDto = customerDto.Products
                 .Where(x => !x.Id.HasValue)
                 .ToList();
 

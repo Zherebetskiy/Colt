@@ -29,6 +29,8 @@ namespace Colt.Application
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddTransient<ICustomerService, CustomerService>();
+            services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<IOrderService, OrderService>();
 
             return services;
         }

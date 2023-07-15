@@ -46,9 +46,32 @@
                 </StackPanel>
             </TabItem>
             <TabItem Header="Customers" FontSize="20">
-                <Grid>
-                    <TextBlock Text="This is Tab 3" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Grid>
+                <StackPanel Height="Auto">
+                    <Button Content="Add new" Width="100" HorizontalAlignment="Left" Margin ="10 10 0 0" Click="ButtonCreateCustomer_OnClick"/>
+                    <DataGrid x:Name="DataGridCustomers" AutoGenerateColumns="False"
+                      CanUserAddRows="False" Height="300" Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Visibility="Hidden"/>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" Width="*"  IsReadOnly="True"/>
+                            <DataGridTemplateColumn Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Edit" x:Name="ButtonEditCustomer" 
+                                        Click="ButtonEditCustomer_OnClick"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Delete" x:Name="ButtonDeleteCustomer"
+                                        Click="ButtonDeleteCustomer_OnClick"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
             </TabItem>
             <TabItem Header="Orders" FontSize="20">
                 <Grid>

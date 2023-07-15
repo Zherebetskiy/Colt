@@ -24,7 +24,9 @@ namespace Colt.Application.Commands.Customers
 
         public Task<CustomerDto> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
         {
-            return _customerService.CreateAsync(request, cancellationToken);
+            ////return _customerService.CreateAsync(request, cancellationToken);
+            ///
+            throw new NotImplementedException();
         }
     }
 }

@@ -70,7 +70,7 @@ namespace Colt.DesktopUI
                 }, CancellationToken.None);
             }
 
-            await _mainWindow.PopulateGrids();
+            await _mainWindow.PopulateProductsGrids();
 
             Close();
         }

@@ -10,6 +10,12 @@ namespace Colt.Application.Common.Exceptions
             Errors = new Dictionary<string, string[]>();
         }
 
+        public ValidationException(string message)
+        : base(message)
+        {
+            Errors = new Dictionary<string, string[]>();
+        }
+
         public ValidationException(IEnumerable<ValidationFailure> failures) : this()
         {
             Errors = failures

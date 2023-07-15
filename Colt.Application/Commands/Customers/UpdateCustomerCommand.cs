@@ -25,7 +25,7 @@ namespace Colt.Application.Commands.Customers
 
             public Task<CustomerDto> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
             {
-                return _customerService.UpdateAsync(request, cancellationToken);
+                return _customerService.UpdateAsync(new CustomerDto(), cancellationToken);
             }
         }
     }

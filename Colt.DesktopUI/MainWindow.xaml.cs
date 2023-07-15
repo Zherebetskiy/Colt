@@ -1,6 +1,8 @@
 ﻿using Colt.Application.Commands;
 using Colt.Application.Commands.Products;
 using Colt.Application.Common.Models;
+using Colt.Application.Common.Services;
+using Colt.Application.Interfaces;
 using Colt.Application.Queries;
 using Colt.Domain.Common;
 using MediatR;
@@ -29,22 +31,30 @@ namespace Colt.DesktopUI
     public partial class MainWindow : Window
     {
         private readonly IMediator _mediator;
+        private readonly ICustomerService _customerService;
 
-        public MainWindow(IMediator mediator)
+        public MainWindow(
+            IMediator mediator,
+            ICustomerService customerService)
         {
             _mediator = mediator;
+            _customerService = customerService;
 
             InitializeComponent();
         }
 
-        public async Task PopulateGrids()
-        {
-            DataGridProducts.ItemsSource = await _mediator.Send(new GetProductsQuery(), CancellationToken.None);
-        }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await PopulateGrids();
+            await PopulateProductsGrids();
+            await PopulateCustomersGrids();
+        }
+
+        #region prducts
+
+        public async Task PopulateProductsGrids()
+        {
+            DataGridProducts.ItemsSource = await _mediator.Send(new GetProductsQuery(), CancellationToken.None);
         }
 
         private void ButtonEditProduct_OnClick(object sender, RoutedEventArgs e)
@@ -70,5 +80,31 @@ namespace Colt.DesktopUI
             var createProductWindow = new CreateProduct(_mediator, this);
             createProductWindow.ShowDialog();
         }
+
+        #endregion
+
+        #region customers
+
+        private void ButtonCreateCustomer_OnClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonEditCustomer_OnClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonDeleteCustomer_OnClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        public async Task PopulateCustomersGrids()
+        {
+            DataGridCustomers.ItemsSource = await _customerService.GetAsync(CancellationToken.None);
+        }
+
+        #endregion
     }
 }
