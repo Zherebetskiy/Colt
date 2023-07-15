@@ -5,6 +5,7 @@ using Colt.Application.Queries;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,6 +30,10 @@ namespace Colt.DesktopUI
             _productService = productService;
 
             _serviceProvider = serviceProvider;
+
+            CultureInfo ci = CultureInfo.CreateSpecificCulture("uk-UA");
+            ci.DateTimeFormat.ShortDatePattern = "dd-MMM-yyyy";
+            Thread.CurrentThread.CurrentCulture = ci;
 
             InitializeComponent();
         }

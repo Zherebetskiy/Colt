@@ -13,7 +13,8 @@ namespace Colt.Application.Common.Mappings
             CreateMap<CustomerDto, Customer>(MemberList.Destination);
 
             CreateMap<CustomerProduct, CustomerProductDto>(MemberList.Destination)
-                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(x => x.Product.Name));
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(x => x.Product.Name))
+                .ForMember(dest => dest.ProductPrice, opt => opt.MapFrom(x => x.Price));
 
             CreateMap<CustomerProductDto, CustomerProduct>(MemberList.Destination);
 

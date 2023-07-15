@@ -1,0 +1,58 @@
+﻿<Window x:Class="Colt.DesktopUI.OrderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Colt.DesktopUI"
+        mc:Ignorable="d"
+        Title="OrderWindow" Height="450" Width="800"  FontSize="20">
+    <ScrollViewer>
+        <Grid Margin="5,5,5,5" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20px" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20px" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20px" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBox  Name="txtId" Visibility="Hidden"/>
+            <TextBox  Name="txtCustomerId" Visibility="Hidden"/>
+            <TextBlock Grid.Row="1" Grid.ColumnSpan="2">CustomerName</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="3">OrderDate</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="4" Name="txtOrderDate"  Grid.ColumnSpan="2">OrderDate</TextBlock>
+            
+            <TextBlock Grid.Row="3" Grid.Column="3">Delivery Date</TextBlock>
+            <DatePicker Grid.Row="3" Grid.Column="4"  Grid.ColumnSpan="2" SelectedDateFormat="Short" SelectedDate="{x:Static sys:DateTime.Now}"
+                  DisplayDateStart="01/01/2014" FirstDayOfWeek="Monday"/>
+            
+            <DataGrid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="6" x:Name="DataGridOrderProducts" AutoGenerateColumns="False"
+                      CanUserAddRows="False" CanUserDeleteRows="False" MaxHeight="300" Margin ="0 10 0 10" CellEditEnding="CellValue_OnChange">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Visibility="Hidden"/>
+                    <DataGridTextColumn Header="CustomerProductId" Binding="{Binding Path=CustomerProductId}" Visibility="Hidden"/>
+                    <DataGridTextColumn Header="ProductName" Binding="{Binding Path=ProductName}" Width="*"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="ProductPrice" Binding="{Binding Path=ProductPrice}" Width="*" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="OrderedWeight" Binding="{Binding Path=OrderedWeight}" Width="*" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="ActualWeight" Binding="{Binding Path=ActualWeight}" Width="*" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="TotalPrice" Binding="{Binding Path=TotalPrice}" Width="*" IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Button Grid.Row="6" Grid.Column="0" Click="ButtonCancel_OnClick">Cancel</Button>
+            <Button Grid.Row="6" Grid.Column="1" Margin="5,0,0,0" Click="ButtonSave_OnClick">Save</Button>
+
+        </Grid>
+    </ScrollViewer>
+</Window>

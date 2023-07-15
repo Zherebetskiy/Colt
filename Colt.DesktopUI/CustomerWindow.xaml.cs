@@ -86,7 +86,9 @@ namespace Colt.DesktopUI
 
         private void ButtonCreateCustomerOrder_OnClick(object sender, RoutedEventArgs e)
         {
+            var orderWindow = new OrderWindow(_serviceProvider, _customerDto.Id.Value);
 
+            orderWindow.ShowDialog();
         }
 
         private void ButtonEditCustomerOrder_OnClick(object sender, RoutedEventArgs e)
