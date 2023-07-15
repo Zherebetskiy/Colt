@@ -1,23 +1,14 @@
-﻿using Colt.Application.Commands.Products;
-using Colt.Application.Common.Models;
+﻿using Colt.Application.Common.Models;
 using Colt.Application.Interfaces;
-using Colt.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Colt.DesktopUI
 {
@@ -59,7 +50,7 @@ namespace Colt.DesktopUI
                 addOrderButton.Visibility = Visibility.Hidden;
             }
 
-            Task.FromResult(PopulateProductsDropdown(customerDto.Id));
+            Task.FromResult(PopulateProductsDropdown(customerDto?.Id));
 
             DataGridCustomerProducts.ItemsSource = _customerProducts;
         }
