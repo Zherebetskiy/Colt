@@ -13,6 +13,9 @@ namespace Colt.Infrastructure.Persistance.Configurations
             builder.Property(x => x.OrderDate)
                 .IsRequired(true);
 
+            builder.Property(x => x.DeliveryDate)
+                .IsRequired(true);
+
             builder.Property(x => x.TotalPrice)
                 .IsRequired(false);
 

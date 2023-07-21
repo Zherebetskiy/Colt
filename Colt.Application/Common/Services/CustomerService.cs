@@ -4,6 +4,7 @@ using Colt.Application.Common.Models;
 using Colt.Application.Interfaces;
 using Colt.Domain.Entities;
 using Colt.Domain.Repositories;
+using System.Threading;
 
 namespace Colt.Application.Common.Services
 {
@@ -32,6 +33,18 @@ namespace Colt.Application.Common.Services
             var customerProducts = _repository.GetProductsByCustomerId(id);
 
             return _mapper.Map<List<CustomerProductDto>>(customerProducts);
+        }
+
+        public CustomerDto GetById(int id)
+        {
+            var customer = _repository.GetById(id);
+
+            if (customer is null)
+            {
+                throw new ValidationException("Product not found");
+            }
+
+            return _mapper.Map<CustomerDto>(customer);
         }
 
         public async Task<CustomerDto> GetByIdAsync(int id, CancellationToken cancellationToken)
@@ -76,40 +89,7 @@ namespace Colt.Application.Common.Services
 
             customer.Name = customerDto.Name;
 
-            var productIds = customerDto.Products
-                .Where(x => x.Id.HasValue)
-                .Select(x => x.ProductId)
-                .ToList();
-
-            var deletedProducts = customer
-                .Products
-                .Where(x => !productIds.Contains(x.ProductId))
-                .ToList();
-
-            await _repository.DeleteProductsAsync(deletedProducts, cancellationToken);
-
-            var createdProductsDto = customerDto.Products
-                .Where(x => !x.Id.HasValue)
-                .ToList();
-
-            var productsToAdd = _mapper.Map<List<CustomerProduct>>(createdProductsDto);
-
-            foreach (var product in productsToAdd)
-            {
-                customer.Products.Add(product);   
-            }
-
-            foreach (var product in customer.Products)
-            {
-                var productDto = customerDto.Products.FirstOrDefault(x => x.Id == product.Id);
-
-                if (productDto == null)
-                {
-                    continue;
-                }
-
-                product.Price = productDto.Price;
-            }
+            await HandleProductsAsync(customer, customerDto, cancellationToken);
 
             await _repository.UpdateAsync(customer, cancellationToken);
 
@@ -128,6 +108,44 @@ namespace Colt.Application.Common.Services
             await _repository.DeleteAsync(customer, cancellationToken);
 
             return true;
+        }
+
+        private async Task HandleProductsAsync(Customer customer, CustomerDto customerDto, CancellationToken cancellationToken)
+        {
+            var productIds = customerDto.Products
+                .Where(x => x.Id.HasValue)
+                .Select(x => x.ProductId)
+                .ToList();
+
+            var deletedProducts = customer
+                .Products
+                .Where(x => !productIds.Contains(x.ProductId))
+            .ToList();
+
+            await _repository.DeleteProductsAsync(deletedProducts, cancellationToken);
+
+            var createdProductsDto = customerDto.Products
+                .Where(x => !x.Id.HasValue)
+                .ToList();
+
+            var productsToAdd = _mapper.Map<List<CustomerProduct>>(createdProductsDto);
+
+            foreach (var product in productsToAdd)
+            {
+                customer.Products.Add(product);
+            }
+
+            foreach (var product in customer.Products)
+            {
+                var productDto = customerDto.Products.FirstOrDefault(x => x.Id == product.Id);
+
+                if (productDto == null)
+                {
+                    continue;
+                }
+
+                product.Price = productDto.Price;
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ namespace Colt.Domain.Entities
 {
     public class Order : BaseEntity<int>
     {
-        public DateTime? DeliveryDate { get; set; }
+        public DateTime DeliveryDate { get; set; }
 
         public DateTime OrderDate { get; set; }
 
