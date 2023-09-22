@@ -23,8 +23,17 @@ namespace Colt.Infrastructure.Repositories
                 .Where(x => x.Id == id)
                 .Include(x => x.Products)
                     .ThenInclude(x => x.CustomerProduct)
+                        .ThenInclude(x => x.Product)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public Task<List<Order>> GetByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
+        {
+            return _dbSet
+                .Where(x => x.CustomerId == customerId)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<bool> DeleteProductsAsync(List<OrderProduct> products, CancellationToken cancellationToken)
@@ -35,6 +44,5 @@ namespace Colt.Infrastructure.Repositories
 
             return true;
         }
-
     }
 }

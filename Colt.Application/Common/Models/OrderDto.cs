@@ -1,4 +1,6 @@
-﻿namespace Colt.Application.Common.Models
+﻿using Colt.Domain.Enums;
+
+namespace Colt.Application.Common.Models
 {
     public class OrderDto
     {
@@ -9,6 +11,8 @@
         public DateTime OrderDate { get; set; }
 
         public int CustomerId { get; set; }
+
+        public OrderStatus Status { get; set; }
 
         public List<OrderProductDto> Products { get; set; } = new List<OrderProductDto>();
 

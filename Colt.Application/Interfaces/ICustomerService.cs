@@ -17,7 +17,5 @@ namespace Colt.Application.Interfaces
         Task<CustomerDto> UpdateAsync(CustomerDto request, CancellationToken cancellationToken);
 
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
-
-        CustomerDto GetById(int id);
     }
 }

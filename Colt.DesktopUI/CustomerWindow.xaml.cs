@@ -1,5 +1,6 @@
 ﻿using Colt.Application.Common.Models;
 using Colt.Application.Interfaces;
+using Colt.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -18,6 +19,8 @@ namespace Colt.DesktopUI
     public partial class CustomerWindow : Window
     {
         private readonly List<CustomerProductDto> _customerProducts = new List<CustomerProductDto>();
+        private List<OrderDto> _customerOrders = new List<OrderDto>();
+        private List<ProductDropdownDto> _customerDropdowns = new List<ProductDropdownDto>();
 
         private readonly IServiceProvider _serviceProvider;
         private readonly IProductService _productService;
@@ -37,22 +40,23 @@ namespace Colt.DesktopUI
             _mainWindow = mainWindow;
             _customerDto = customerDto;
 
+            DataGridCustomerProducts.ItemsSource = _customerProducts;
+
+            Task.Run(() => PopulateProductsDropdownAsync());
+
             if (customerDto != null)
             {
                 txtId.Text = customerDto.Id?.ToString();
                 txtName.Text = customerDto.Name;
 
-                PopulateCustomerProducts(customerDto.Id.Value);
+                Task.Run(() => PopulateCustomerProductsAsync(customerDto.Id.Value));
+                Task.Run(() => PopulateCustomerOrdersAsync(customerDto.Id.Value));
             }
             else
             {
                 DataGridCustomerOrders.Visibility = Visibility.Hidden;
                 addOrderButton.Visibility = Visibility.Hidden;
             }
-
-            Task.FromResult(PopulateProductsDropdown(customerDto?.Id));
-
-            DataGridCustomerProducts.ItemsSource = _customerProducts;
         }
 
         private void Product_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -93,12 +97,17 @@ namespace Colt.DesktopUI
 
         private void ButtonEditCustomerOrder_OnClick(object sender, RoutedEventArgs e)
         {
+            var orderDto = ((FrameworkElement)sender).DataContext as OrderDto;
 
+            var editOrderWindow = new OrderWindow(this, _serviceProvider, _customerDto.Id.Value, orderDto.Id.Value);
+            editOrderWindow.ShowDialog();
         }
 
         private void ButtonDeleteCustomerOrder_OnClick(object sender, RoutedEventArgs e)
         {
+            var order = ((FrameworkElement)sender).DataContext as OrderDto;
 
+            Task.Run(() => DeleteCustomerOrderAsync(order?.Id ?? default));
         }
 
         private void ButtonCancel_OnClick(object sender, RoutedEventArgs e)
@@ -112,6 +121,7 @@ namespace Colt.DesktopUI
             {
                 _customerDto.Name = txtName.Text;
                 _customerDto.Products = _customerProducts;
+                _customerDto.Orders = _customerOrders;
 
                 await _serviceProvider.GetRequiredService<ICustomerService>()
                     .UpdateAsync(_customerDto, CancellationToken.None);
@@ -121,7 +131,8 @@ namespace Colt.DesktopUI
                 _customerDto = new CustomerDto
                 {
                     Name = txtName.Text,
-                    Products = _customerProducts
+                    Products = _customerProducts,
+                    Orders = _customerOrders
                 };
 
                 await _serviceProvider.GetRequiredService<ICustomerService>()
@@ -133,9 +144,9 @@ namespace Colt.DesktopUI
             Close();
         }
 
-        private async Task PopulateProductsDropdown(int? customerId)
+        private async Task PopulateProductsDropdownAsync()
         {
-            var products = (await _productService.GetAsync(CancellationToken.None))
+            _customerDropdowns = (await _productService.GetAsync(CancellationToken.None))
                     .Select(x => new ProductDropdownDto
                     {
                         Name = x.Name,
@@ -143,28 +154,53 @@ namespace Colt.DesktopUI
                     })
                     .ToList();
 
-            if (customerId.HasValue)
+            await Dispatcher.BeginInvoke(() =>
             {
-                products.ForEach(x => x.IsSelected = _customerProducts.Any(p => p.ProductId == x.Id));
-            }
-
-            ProductsBox.ItemsSource = products;
+                ProductsBox.ItemsSource = _customerDropdowns;
+            });
         }
 
-        private void PopulateCustomerProducts(int id)
+        private async Task PopulateCustomerProductsAsync(int id)
         {
-            var products = _serviceProvider.GetRequiredService<ICustomerService>()
-                .GetProducts(id);
+            var products = await _serviceProvider.GetRequiredService<ICustomerService>()
+                .GetProductsAsync(id, CancellationToken.None);
 
             _customerProducts.AddRange(products);
+
+            await Dispatcher.BeginInvoke(() =>
+            {
+                _customerDropdowns.ForEach(x => x.IsSelected = _customerProducts.Any(p => p.ProductId == x.Id));
+
+                ProductsBox.Items.Refresh();
+
+                DataGridCustomerProducts.Items.Refresh();
+            });
         }
 
-        public void PopulateCustomerOrders(int id)
+        public async Task PopulateCustomerOrdersAsync(int id)
         {
-            var products = _serviceProvider.GetRequiredService<ICustomerService>()
-                .GetProducts(id);
+            var orders = await _serviceProvider.GetRequiredService<IOrderService>()
+                .GetByCustomerIdAsync(id, CancellationToken.None);
 
-            _customerProducts.AddRange(products);
+            _customerOrders = orders;
+
+            await Dispatcher.BeginInvoke(() =>
+            {
+                DataGridCustomerOrders.ItemsSource = _customerOrders;
+
+                DataGridCustomerOrders.Items.Refresh();
+            });
+        }
+
+        private async Task DeleteCustomerOrderAsync(int orderId)
+        {
+            await _serviceProvider.GetRequiredService<IOrderService>()
+                .DeleteAsync(orderId, CancellationToken.None);
+
+            await Dispatcher.BeginInvoke(() =>
+            {
+                DataGridCustomerOrders.ItemsSource = _customerOrders;
+            });
         }
     }
 }

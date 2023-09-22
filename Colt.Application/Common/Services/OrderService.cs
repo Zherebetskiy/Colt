@@ -11,16 +11,13 @@ namespace Colt.Application.Common.Services
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
 
         public OrderService(
             IOrderRepository orderRepository,
-            ICustomerRepository customerRepository,
             IMapper mapper)
         {
             _orderRepository = orderRepository;
-            _customerRepository = customerRepository;
             _mapper = mapper;
         }
 
@@ -36,6 +33,13 @@ namespace Colt.Application.Common.Services
             return _mapper.Map<OrderDto>(order);
         }
 
+        public async Task<List<OrderDto>> GetByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
+        {
+            var order = await _orderRepository.GetByCustomerIdAsync(customerId, cancellationToken);
+
+            return _mapper.Map< List<OrderDto>>(order);
+        }
+
         public async Task<List<OrderDto>> GetAsync(CancellationToken cancellationToken)
         {
             var orders = await _orderRepository.GetAsync(cancellationToken);
@@ -47,35 +51,14 @@ namespace Colt.Application.Common.Services
         {
             var order = _mapper.Map<Order>(orderDto);
 
-            var customer = await _customerRepository.GetWithProductsAsync(order.CustomerId, cancellationToken);
-
-            double? totalWeight = null;
-            decimal? totalPrice = null;
-
             order.Status = OrderStatus.Created;
 
-            foreach (var product in order.Products)
+            RecalculateTotals(order);
+
+            if (order.TotalWeight.HasValue)
             {
-                var customerProduct = customer.Products.FirstOrDefault(x => x.Id == product.CustomerProductId);
-
-                if (customerProduct == null)
-                {
-                    throw new ValidationException($"CustomerProduct with id: {product.CustomerProductId} not found");
-                }
-
-                if (product.ActualWeight.HasValue)
-                {
-                    order.Status = OrderStatus.Calculated;
-
-                    product.TotalPrice = (decimal)product.ActualWeight.Value * customerProduct.Price;
-
-                    totalWeight += product.ActualWeight.Value;
-                    totalPrice += product.TotalPrice;
-                }
+                order.Status = OrderStatus.Calculated;
             }
-
-            order.TotalWeight = totalWeight;
-            order.TotalPrice = totalPrice;
 
             await _orderRepository.AddAsync(order, cancellationToken);
 
@@ -103,6 +86,10 @@ namespace Colt.Application.Common.Services
 
             await _orderRepository.DeleteProductsAsync(deletedProducts, cancellationToken);
 
+            order.Products = order.Products
+                .Where(x => !deletedProducts.Contains(x))
+                .ToList();
+
             var createdProductsDto = orderDto.Products
                 .Where(x => !x.Id.HasValue)
                 .ToList();
@@ -110,6 +97,21 @@ namespace Colt.Application.Common.Services
             var createdProducts = _mapper.Map<List<OrderProduct>>(createdProductsDto);
 
             createdProducts.ForEach(x => order.Products.Add(x));
+
+            var updatedProductsDto = orderDto.Products
+                .Where(x => x.Id.HasValue)
+                .ToList();
+
+            foreach (var updatedProduct in updatedProductsDto)
+            {
+                var product = order.Products.First(x => x.Id == updatedProduct.Id);
+
+                product.OrderedWeight = updatedProduct.OrderedWeight;
+                product.ActualWeight = updatedProduct.ActualWeight;
+                product.TotalPrice = updatedProduct.TotalPrice;
+            }
+
+            RecalculateTotals(order);
 
             await _orderRepository.UpdateAsync(order, cancellationToken);
 
@@ -128,6 +130,17 @@ namespace Colt.Application.Common.Services
             await _orderRepository.DeleteAsync(order, cancellationToken);
 
             return true;
+        }
+
+        private void RecalculateTotals(Order order)
+        {
+            order.TotalWeight = order.Products
+                .Where(x => x.ActualWeight.HasValue)
+                .Sum(x => x.ActualWeight);
+
+            order.TotalPrice = order.Products
+                .Where(x => x.TotalPrice.HasValue)
+                .Sum(x => x.TotalPrice);
         }
     }
 }

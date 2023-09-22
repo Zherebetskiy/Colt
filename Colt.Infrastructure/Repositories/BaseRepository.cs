@@ -48,11 +48,18 @@ namespace Colt.Infrastructure.Repositories
 
         public virtual async Task<bool> DeleteAsync(TEntity entity, CancellationToken token)
         {
-            _dbSet.Remove(entity);
+            try
+            {
+                _dbSet.Remove(entity);
 
-            await _dbContext.SaveChangesAsync(token);
+                await _dbContext.SaveChangesAsync(token);
 
-            return true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public virtual Task<int> SaveChangesAsync(CancellationToken token)

@@ -1,24 +1,12 @@
 ﻿using Colt.Application.Common.Models;
 using Colt.Application.Interfaces;
-using Colt.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Xml.Linq;
 
 namespace Colt.DesktopUI
 {
@@ -32,7 +20,7 @@ namespace Colt.DesktopUI
         private readonly CustomerWindow _customerWindow;
         private readonly IOrderService _orderService;
         private readonly IServiceProvider _serviceProvider;
-        private readonly int _customerId;
+        private OrderDto _order;
 
         public OrderWindow(
             CustomerWindow customerWindow,
@@ -44,7 +32,6 @@ namespace Colt.DesktopUI
             _serviceProvider = serviceProvider;
             _orderService = _serviceProvider.GetRequiredService<IOrderService>();
 
-            _customerId = customerId;
             InitializeComponent();
 
             LoadData(customerId, orderId);
@@ -57,25 +44,18 @@ namespace Colt.DesktopUI
 
         private async void ButtonSave_OnClick(object sender, RoutedEventArgs e)
         {
-            var orderDto = new OrderDto
-            {
-                Id = !string.IsNullOrEmpty(txtId.Text) ? int.Parse(txtId.Text) : null,
-                CustomerId = int.Parse(txtCustomerId.Text),
-                DeliveryDate = DateTime.Parse(txtDeliveryDate.Text),
-                OrderDate = DateTime.Parse(txtOrderDate.Text),
-                Products = _orderProducts
-            };
+            _order.DeliveryDate = DateTime.Parse(txtDeliveryDate.Text);
 
-            if (orderDto.Id.HasValue)
+            if (_order.Id.HasValue)
             {
-                await _orderService.UpdateAsync(orderDto, CancellationToken.None);
+                await _orderService.UpdateAsync(_order, CancellationToken.None);
             }
             else
             {
-                await _orderService.CreateAsync(orderDto, CancellationToken.None);
+                await _orderService.CreateAsync(_order, CancellationToken.None);
             }
 
-            _customerWindow.PopulateCustomerOrders(_customerId);
+            await _customerWindow.PopulateCustomerOrdersAsync(_order.CustomerId);
 
             Close();
         }
@@ -90,8 +70,6 @@ namespace Colt.DesktopUI
 
             if (!orderId.HasValue)
             {
-                txtOrderDate.Text = DateTime.Now.ToString(Thread.CurrentThread.CurrentCulture);
-
                 var products = _serviceProvider.GetRequiredService<ICustomerService>()
                     .GetProducts(customerId)
                     .Select(x => new OrderProductDto
@@ -102,30 +80,30 @@ namespace Colt.DesktopUI
                     });
 
                 _orderProducts.AddRange(products);
+
+                _order = new OrderDto
+                {
+                    CustomerId = customerId,
+                    DeliveryDate = DateTime.Now,
+                    OrderDate = DateTime.Now,
+                    Products = _orderProducts
+                };
+
+                txtOrderDate.Text = _order.OrderDate.ToString(Thread.CurrentThread.CurrentCulture);
             }
             else
             {
-                var order = await _orderService.GetByIdAsync(orderId.Value, CancellationToken.None);
+                _order = await _orderService.GetByIdAsync(orderId.Value, CancellationToken.None);
 
                 txtId.Text = orderId.ToString();
-                txtOrderDate.Text = order.OrderDate.ToString(Thread.CurrentThread.CurrentCulture);
-                txtDeliveryDate.Text = order.DeliveryDate.ToString(Thread.CurrentThread.CurrentCulture);
+                txtOrderTotalPrice.Text = _order.TotalPrice.HasValue ? _order.TotalPrice.Value.ToString("N0") : string.Empty;
+                txtOrderDate.Text = _order.OrderDate.ToString(Thread.CurrentThread.CurrentCulture);
+                txtDeliveryDate.Text = _order.DeliveryDate.ToString(Thread.CurrentThread.CurrentCulture);
 
-                _orderProducts.AddRange(order.Products);    
+                _orderProducts.AddRange(_order.Products);    
             }
 
             DataGridOrderProducts.ItemsSource = _orderProducts;
-        }
-
-        private void ButtonCalculate_OnClick(object sender, RoutedEventArgs e)
-        {
-            foreach (var orderProduct in _orderProducts.Where(x => x.ActualWeight.HasValue))
-            {
-                orderProduct.TotalPrice = (decimal)orderProduct.ActualWeight * orderProduct.ProductPrice;
-            }
-
-            DataGridOrderProducts.Items.Refresh();
-
         }
 
         private void CellValue_OnEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -143,6 +121,12 @@ namespace Colt.DesktopUI
                 if (!e.Row.IsEditing)
                 {
                     DataGridOrderProducts.Items.Refresh();
+
+                    _order.TotalPrice = _orderProducts
+                        .Where(x => x.TotalPrice.HasValue)
+                        .Sum(x => x.TotalPrice);
+
+                    txtOrderTotalPrice.Text = _order.TotalPrice.Value.ToString("N0", Thread.CurrentThread.CurrentCulture);
                 }
             }
         }

@@ -6,6 +6,8 @@ namespace Colt.Application.Interfaces
     {
         Task<OrderDto> GetByIdAsync(int id, CancellationToken cancellationToken);
 
+        Task<List<OrderDto>> GetByCustomerIdAsync(int customerId, CancellationToken cancellationToken);
+
         Task<List<OrderDto>> GetAsync(CancellationToken cancellationToken);
 
         Task<OrderDto> CreateAsync(OrderDto orderDto, CancellationToken cancellationToken);

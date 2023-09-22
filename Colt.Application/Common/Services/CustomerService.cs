@@ -4,7 +4,6 @@ using Colt.Application.Common.Models;
 using Colt.Application.Interfaces;
 using Colt.Domain.Entities;
 using Colt.Domain.Repositories;
-using System.Threading;
 
 namespace Colt.Application.Common.Services
 {
@@ -35,18 +34,6 @@ namespace Colt.Application.Common.Services
             return _mapper.Map<List<CustomerProductDto>>(customerProducts);
         }
 
-        public CustomerDto GetById(int id)
-        {
-            var customer = _repository.GetById(id);
-
-            if (customer is null)
-            {
-                throw new ValidationException("Product not found");
-            }
-
-            return _mapper.Map<CustomerDto>(customer);
-        }
-
         public async Task<CustomerDto> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             var customer = await _repository.GetByIdAsync(id, cancellationToken);
@@ -68,19 +55,11 @@ namespace Colt.Application.Common.Services
 
         public async Task<CustomerDto> CreateAsync(CustomerDto customerDto, CancellationToken cancellationToken)
         {
-            try
-            {
-                var customer = _mapper.Map<Customer>(customerDto);
+            var customer = _mapper.Map<Customer>(customerDto);
 
-                await _repository.AddAsync(customer, cancellationToken);
+            await _repository.AddAsync(customer, cancellationToken);
 
-                return _mapper.Map<CustomerDto>(customer);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            return _mapper.Map<CustomerDto>(customer);
         }
 
         public async Task<CustomerDto> UpdateAsync(CustomerDto customerDto, CancellationToken cancellationToken)

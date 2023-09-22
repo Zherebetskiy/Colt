@@ -15,7 +15,7 @@ namespace Colt.Infrastructure.Persistance.Configurations
                 .IsRequired(true);
 
             builder.Property(x => x.TotalPrice)
-                .IsRequired(true);
+                .IsRequired(false);
 
             builder.Property(x => x.OrderedWeight)
                .IsRequired(false);

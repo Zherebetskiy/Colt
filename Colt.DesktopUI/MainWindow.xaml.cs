@@ -119,6 +119,8 @@ namespace Colt.DesktopUI
         {
             DataGridCustomers.ItemsSource = await _serviceProvider.GetRequiredService<ICustomerService>()
                 .GetAsync(CancellationToken.None);
+
+            DataGridCustomers.Items.Refresh();
         }
 
         #endregion

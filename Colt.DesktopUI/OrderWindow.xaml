@@ -6,7 +6,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Colt.DesktopUI"
         mc:Ignorable="d"
-        Title="OrderWindow" Height="450" Width="800"  FontSize="20">
+        Title="OrderWindow" Height="450" Width="800"  FontSize="20"
+        WindowState="Maximized">
     <ScrollViewer>
         <Grid Margin="5,5,5,5" >
             <Grid.ColumnDefinitions>
@@ -50,7 +51,8 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <Button Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" Margin ="0 10 0 30" Click="ButtonCalculate_OnClick">Calculate</Button>
+            <TextBlock Grid.Row="5" Grid.Column="3" Margin ="0 10 0 30" >Total Price</TextBlock>
+            <TextBlock Grid.Row="5" Grid.Column="4" Name="txtOrderTotalPrice" Grid.ColumnSpan="2" Margin ="0 10 0 30" >0</TextBlock>
             
             <Button Grid.Row="6" Grid.Column="0" Click="ButtonCancel_OnClick">Cancel</Button>
             <Button Grid.Row="6" Grid.Column="1" Margin="5,0,0,0" Click="ButtonSave_OnClick">Save</Button>

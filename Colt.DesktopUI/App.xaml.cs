@@ -4,8 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Configuration;
+using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Windows;
+using System.Windows.Markup;
 
 namespace Colt.DesktopUI
 {
@@ -43,6 +46,18 @@ namespace Colt.DesktopUI
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
+            var vCulture = new CultureInfo("uk");
+
+            Thread.CurrentThread.CurrentCulture = vCulture;
+            Thread.CurrentThread.CurrentUICulture = vCulture;
+            CultureInfo.DefaultThreadCurrentCulture = vCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = vCulture;
+
+            FrameworkElement.LanguageProperty.OverrideMetadata(
+            typeof(FrameworkElement),
+            new FrameworkPropertyMetadata(
+            XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
+
             var mainWindow = _serviceProvider.GetService<MainWindow>();
 
             mainWindow.Show();
