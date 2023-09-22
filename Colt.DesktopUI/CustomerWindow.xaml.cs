@@ -86,7 +86,7 @@ namespace Colt.DesktopUI
 
         private void ButtonCreateCustomerOrder_OnClick(object sender, RoutedEventArgs e)
         {
-            var orderWindow = new OrderWindow(_serviceProvider, _customerDto.Id.Value);
+            var orderWindow = new OrderWindow(this, _serviceProvider, _customerDto.Id.Value);
 
             orderWindow.ShowDialog();
         }
@@ -152,6 +152,14 @@ namespace Colt.DesktopUI
         }
 
         private void PopulateCustomerProducts(int id)
+        {
+            var products = _serviceProvider.GetRequiredService<ICustomerService>()
+                .GetProducts(id);
+
+            _customerProducts.AddRange(products);
+        }
+
+        public void PopulateCustomerOrders(int id)
         {
             var products = _serviceProvider.GetRequiredService<ICustomerService>()
                 .GetProducts(id);

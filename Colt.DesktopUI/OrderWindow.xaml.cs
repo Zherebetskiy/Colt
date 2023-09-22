@@ -29,15 +29,18 @@ namespace Colt.DesktopUI
     {
         private readonly List<OrderProductDto> _orderProducts = new List<OrderProductDto>();
 
+        private readonly CustomerWindow _customerWindow;
         private readonly IOrderService _orderService;
         private readonly IServiceProvider _serviceProvider;
         private readonly int _customerId;
 
         public OrderWindow(
+            CustomerWindow customerWindow,
             IServiceProvider serviceProvider,
             int customerId,
             int? orderId = null)
         {
+            _customerWindow = customerWindow;
             _serviceProvider = serviceProvider;
             _orderService = _serviceProvider.GetRequiredService<IOrderService>();
 
@@ -52,30 +55,27 @@ namespace Colt.DesktopUI
             Close();
         }
 
-        private void ButtonSave_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonSave_OnClick(object sender, RoutedEventArgs e)
         {
-            var orderDto = new OrderDto();
-            ////if (!txtId.Text.IsNullOrEmpty())
-            ////{
-            ////    _customerDto.Name = txtName.Text;
-            ////    _customerDto.Products = _customerProducts;
+            var orderDto = new OrderDto
+            {
+                Id = !string.IsNullOrEmpty(txtId.Text) ? int.Parse(txtId.Text) : null,
+                CustomerId = int.Parse(txtCustomerId.Text),
+                DeliveryDate = DateTime.Parse(txtDeliveryDate.Text),
+                OrderDate = DateTime.Parse(txtOrderDate.Text),
+                Products = _orderProducts
+            };
 
-            ////    await _serviceProvider.GetRequiredService<ICustomerService>()
-            ////        .UpdateAsync(_customerDto, CancellationToken.None);
-            ////}
-            ////else
-            ////{
-            ////    _customerDto = new CustomerDto
-            ////    {
-            ////        Name = txtName.Text,
-            ////        Products = _customerProducts
-            ////    };
+            if (orderDto.Id.HasValue)
+            {
+                await _orderService.UpdateAsync(orderDto, CancellationToken.None);
+            }
+            else
+            {
+                await _orderService.CreateAsync(orderDto, CancellationToken.None);
+            }
 
-            ////    await _serviceProvider.GetRequiredService<ICustomerService>()
-            ////        .CreateAsync(_customerDto, CancellationToken.None);
-            ////}
-
-            ////await _mainWindow.PopulateCustomersGrids();
+            _customerWindow.PopulateCustomerOrders(_customerId);
 
             Close();
         }
@@ -109,8 +109,7 @@ namespace Colt.DesktopUI
 
                 txtId.Text = orderId.ToString();
                 txtOrderDate.Text = order.OrderDate.ToString(Thread.CurrentThread.CurrentCulture);
-                txtDeliveryDate.Text = order.DeliveryDate.Value.ToString(Thread.CurrentThread.CurrentCulture);
-
+                txtDeliveryDate.Text = order.DeliveryDate.ToString(Thread.CurrentThread.CurrentCulture);
 
                 _orderProducts.AddRange(order.Products);    
             }
