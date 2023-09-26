@@ -197,10 +197,7 @@ namespace Colt.DesktopUI
             await _serviceProvider.GetRequiredService<IOrderService>()
                 .DeleteAsync(orderId, CancellationToken.None);
 
-            await Dispatcher.BeginInvoke(() =>
-            {
-                DataGridCustomerOrders.ItemsSource = _customerOrders;
-            });
+            await PopulateCustomerOrdersAsync(_customerDto.Id.Value);
         }
     }
 }

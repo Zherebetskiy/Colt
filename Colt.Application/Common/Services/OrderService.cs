@@ -81,7 +81,7 @@ namespace Colt.Application.Common.Services
 
             var deletedProducts = order
                 .Products
-                .Where(x => !productIds.Contains(x.CustomerProductId))
+                .Where(x => x.CustomerProductId.HasValue && !productIds.Contains(x.CustomerProductId.Value))
                 .ToList();
 
             await _orderRepository.DeleteProductsAsync(deletedProducts, cancellationToken);

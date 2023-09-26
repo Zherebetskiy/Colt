@@ -33,7 +33,7 @@ namespace Colt.Infrastructure.Persistance.Configurations
             builder.HasMany(x => x.Products)
                 .WithOne(x => x.Order)
                 .HasForeignKey(x => x.OrderId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
