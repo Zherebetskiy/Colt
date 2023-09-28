@@ -28,6 +28,26 @@ namespace Colt.Infrastructure.Repositories
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
+        public Task<Order> GetByIdWithCustomerAsync(int id, CancellationToken cancellationToken)
+        {
+            return _dbSet
+                .Where(x => x.Id == id)
+                .Include(x => x.Products)
+                    .ThenInclude(x => x.CustomerProduct)
+                        .ThenInclude(x => x.Product)
+                .Include(x => x.Customer)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public override Task<List<Order>> GetAsync(CancellationToken cancellationToken)
+        {
+            return _dbSet
+                .Include(x => x.Customer)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
+
         public Task<List<Order>> GetByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
             return _dbSet

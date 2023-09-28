@@ -90,7 +90,7 @@ namespace Colt.DesktopUI
 
         private void ButtonCreateCustomerOrder_OnClick(object sender, RoutedEventArgs e)
         {
-            var orderWindow = new OrderWindow(this, _serviceProvider, _customerDto.Id.Value);
+            var orderWindow = new OrderWindow(null, this, _serviceProvider, _customerDto.Id.Value);
 
             orderWindow.ShowDialog();
         }
@@ -99,7 +99,7 @@ namespace Colt.DesktopUI
         {
             var orderDto = ((FrameworkElement)sender).DataContext as OrderDto;
 
-            var editOrderWindow = new OrderWindow(this, _serviceProvider, _customerDto.Id.Value, orderDto.Id.Value);
+            var editOrderWindow = new OrderWindow(null, this, _serviceProvider, _customerDto.Id.Value, orderDto.Id.Value);
             editOrderWindow.ShowDialog();
         }
 
@@ -190,6 +190,11 @@ namespace Colt.DesktopUI
 
                 DataGridCustomerOrders.Items.Refresh();
             });
+
+            if (_mainWindow != null)
+            {
+                await _mainWindow.PopulateOrdersGrids();
+            }
         }
 
         private async Task DeleteCustomerOrderAsync(int orderId)

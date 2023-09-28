@@ -12,6 +12,8 @@ namespace Colt.Application.Common.Models
 
         public int CustomerId { get; set; }
 
+        public string CustomerName { get; set; }
+
         public OrderStatus Status { get; set; }
 
         public List<OrderProductDto> Products { get; set; } = new List<OrderProductDto>();

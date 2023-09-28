@@ -17,17 +17,20 @@ namespace Colt.DesktopUI
     {
         private readonly List<OrderProductDto> _orderProducts = new List<OrderProductDto>();
 
+        private readonly MainWindow _mainWindow;
         private readonly CustomerWindow _customerWindow;
         private readonly IOrderService _orderService;
         private readonly IServiceProvider _serviceProvider;
         private OrderDto _order;
 
         public OrderWindow(
+            MainWindow mainWindow,
             CustomerWindow customerWindow,
             IServiceProvider serviceProvider,
             int customerId,
             int? orderId = null)
         {
+            _mainWindow = mainWindow;
             _customerWindow = customerWindow;
             _serviceProvider = serviceProvider;
             _orderService = _serviceProvider.GetRequiredService<IOrderService>();
@@ -55,7 +58,15 @@ namespace Colt.DesktopUI
                 await _orderService.CreateAsync(_order, CancellationToken.None);
             }
 
-            await _customerWindow.PopulateCustomerOrdersAsync(_order.CustomerId);
+            if (_customerWindow != null)
+            {
+                await _customerWindow.PopulateCustomerOrdersAsync(_order.CustomerId);
+            }
+
+            if (_mainWindow != null)
+            {
+                await _mainWindow.PopulateOrdersGrids();
+            }
 
             Close();
         }

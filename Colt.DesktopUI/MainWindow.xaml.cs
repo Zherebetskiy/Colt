@@ -9,6 +9,9 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Threading;
 
 namespace Colt.DesktopUI
 {
@@ -20,20 +23,18 @@ namespace Colt.DesktopUI
         private readonly IMediator _mediator;
         private readonly IProductService _productService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IOrderService _orderService;
 
         public MainWindow(
             IMediator mediator,
             IProductService productService,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IOrderService orderService)
         {
             _mediator = mediator;
             _productService = productService;
-
+            _orderService = orderService;
             _serviceProvider = serviceProvider;
-
-            CultureInfo ci = CultureInfo.CreateSpecificCulture("uk-UA");
-            ci.DateTimeFormat.ShortDatePattern = "dd-MMM-yyyy";
-            Thread.CurrentThread.CurrentCulture = ci;
 
             InitializeComponent();
         }
@@ -43,6 +44,7 @@ namespace Colt.DesktopUI
         {
             await PopulateProductsGrids();
             await PopulateCustomersGrids();
+            await PopulateOrdersGrids();
         }
 
         #region prducts
@@ -121,6 +123,74 @@ namespace Colt.DesktopUI
                 .GetAsync(CancellationToken.None);
 
             DataGridCustomers.Items.Refresh();
+        }
+
+        #endregion
+
+        #region
+
+        private void ButtonEditOrder_OnClick(object sender, RoutedEventArgs e)
+        {
+            var orderDto = ((FrameworkElement)sender).DataContext as OrderDto;
+
+            var customerWindow = new OrderWindow(
+                this,
+                null,
+                _serviceProvider,
+                orderDto.CustomerId,
+                orderDto.Id);
+
+            customerWindow.ShowDialog();
+        }
+
+        private async void ButtonDeleteOrder_OnClick(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Do you want to delete order?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    {
+                        var order = ((FrameworkElement)sender).DataContext as OrderDto;
+
+                        await _orderService.DeleteAsync(order.Id ?? default, CancellationToken.None);
+
+                        await PopulateOrdersGrids();
+
+                        break;
+                    }
+                case MessageBoxResult.No:
+                    break;
+            }
+        }
+
+        public async Task PopulateOrdersGrids()
+        {
+            var orders = await _orderService.GetAsync(CancellationToken.None);
+
+            await Dispatcher.BeginInvoke(() =>
+            {
+                DataGridOrders.ItemsSource = orders;
+
+                DataGridOrders.Items.Refresh();
+            });
+        }
+
+        private void ButtonPrintOrder_OnClick(object sender, RoutedEventArgs e)
+        {
+            var orderDto = ((FrameworkElement)sender).DataContext as OrderDto;
+
+            var documentService = _serviceProvider.GetRequiredService<IDocumentService>();
+
+            Task.Run(async () =>
+            {
+                var documentName = await documentService.CreateInvoiceAsync(orderDto.Id.Value);
+
+                await Dispatcher.BeginInvoke(() =>
+                {
+                    MessageBox.Show($"Invoice {documentName} successfully created.", "Document", MessageBoxButton.OK, MessageBoxImage.Information);
+                });
+            });
+
         }
 
         #endregion

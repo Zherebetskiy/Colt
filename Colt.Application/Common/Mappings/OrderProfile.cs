@@ -8,7 +8,8 @@ namespace Colt.Application.Common.Mappings
     {
         public OrderProfile()
         {
-            CreateMap<Order, OrderDto>(MemberList.Destination);
+            CreateMap<Order, OrderDto>(MemberList.Destination)
+                .ForMember(dst => dst.CustomerName, opt => opt.MapFrom(src => src.Customer.Name));
             CreateMap<OrderDto, Order>(MemberList.Destination);
 
             CreateMap<OrderProduct, OrderProductDto>(MemberList.Destination)

@@ -33,11 +33,30 @@ namespace Colt.Application.Common.Services
             return _mapper.Map<OrderDto>(order);
         }
 
+        public async Task<OrderDto> GetByIdWithCustomerAsync(int id, CancellationToken cancellationToken)
+        {
+            var order = await _orderRepository.GetByIdWithCustomerAsync(id, cancellationToken);
+
+            if (order is null)
+            {
+                throw new ValidationException("Order not found");
+            }
+
+            return _mapper.Map<OrderDto>(order);
+        }
+
         public async Task<List<OrderDto>> GetByCustomerIdAsync(int customerId, CancellationToken cancellationToken)
         {
             var order = await _orderRepository.GetByCustomerIdAsync(customerId, cancellationToken);
 
             return _mapper.Map< List<OrderDto>>(order);
+        }
+
+        public async Task<List<OrderDto>> GetAllAsync(CancellationToken cancellationToken)
+        {
+            var order = await _orderRepository.GetAsync(cancellationToken);
+
+            return _mapper.Map<List<OrderDto>>(order);
         }
 
         public async Task<List<OrderDto>> GetAsync(CancellationToken cancellationToken)
@@ -112,6 +131,8 @@ namespace Colt.Application.Common.Services
             }
 
             RecalculateTotals(order);
+
+            order.DeliveryDate = orderDto.DeliveryDate;
 
             await _orderRepository.UpdateAsync(order, cancellationToken);
 

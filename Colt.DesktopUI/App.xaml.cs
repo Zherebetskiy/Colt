@@ -46,7 +46,7 @@ namespace Colt.DesktopUI
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            var vCulture = new CultureInfo("uk");
+            var vCulture = new CultureInfo("uk-UA");
 
             Thread.CurrentThread.CurrentCulture = vCulture;
             Thread.CurrentThread.CurrentUICulture = vCulture;
