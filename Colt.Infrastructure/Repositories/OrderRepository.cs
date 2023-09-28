@@ -22,8 +22,6 @@ namespace Colt.Infrastructure.Repositories
             return _dbSet
                 .Where(x => x.Id == id)
                 .Include(x => x.Products)
-                    .ThenInclude(x => x.CustomerProduct)
-                        .ThenInclude(x => x.Product)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
         }
@@ -32,9 +30,7 @@ namespace Colt.Infrastructure.Repositories
         {
             return _dbSet
                 .Where(x => x.Id == id)
-                .Include(x => x.Products)
-                    .ThenInclude(x => x.CustomerProduct)
-                        .ThenInclude(x => x.Product)
+                .Include(x => x.Products.Where(x => x.TotalPrice.HasValue))
                 .Include(x => x.Customer)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);

@@ -74,7 +74,7 @@ namespace Colt.Application.Common.Services
 
             RecalculateTotals(order);
 
-            if (order.TotalWeight.HasValue)
+            if (order.TotalPrice.HasValue && order.TotalPrice != default)
             {
                 order.Status = OrderStatus.Calculated;
             }
@@ -92,30 +92,6 @@ namespace Colt.Application.Common.Services
             }
 
             var order = await _orderRepository.GetByIdAsync(orderDto.Id.Value, cancellationToken);
-
-            var productIds = orderDto.Products
-                .Where(x => x.Id.HasValue)
-                .Select(x => x.CustomerProductId)
-                .ToList();
-
-            var deletedProducts = order
-                .Products
-                .Where(x => x.CustomerProductId.HasValue && !productIds.Contains(x.CustomerProductId.Value))
-                .ToList();
-
-            await _orderRepository.DeleteProductsAsync(deletedProducts, cancellationToken);
-
-            order.Products = order.Products
-                .Where(x => !deletedProducts.Contains(x))
-                .ToList();
-
-            var createdProductsDto = orderDto.Products
-                .Where(x => !x.Id.HasValue)
-                .ToList();
-
-            var createdProducts = _mapper.Map<List<OrderProduct>>(createdProductsDto);
-
-            createdProducts.ForEach(x => order.Products.Add(x));
 
             var updatedProductsDto = orderDto.Products
                 .Where(x => x.Id.HasValue)
@@ -156,11 +132,11 @@ namespace Colt.Application.Common.Services
         private void RecalculateTotals(Order order)
         {
             order.TotalWeight = order.Products
-                .Where(x => x.ActualWeight.HasValue)
+                .Where(x => x.ActualWeight.HasValue && x.ActualWeight != default)
                 .Sum(x => x.ActualWeight);
 
             order.TotalPrice = order.Products
-                .Where(x => x.TotalPrice.HasValue)
+                .Where(x => x.TotalPrice.HasValue && x.TotalPrice != default)
                 .Sum(x => x.TotalPrice);
         }
     }

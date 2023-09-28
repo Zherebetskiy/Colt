@@ -11,8 +11,11 @@ namespace Colt.Infrastructure.Persistance.Configurations
             builder.Property(x => x.OrderId)
                 .IsRequired(true);
 
-            builder.Property(x => x.CustomerProductId)
-                .IsRequired(false);
+            builder.Property(x => x.ProductName)
+                .IsRequired(true);
+
+            builder.Property(x => x.ProductPrice)
+                .IsRequired(true);
 
             builder.Property(x => x.TotalPrice)
                 .IsRequired(false);
@@ -22,11 +25,6 @@ namespace Colt.Infrastructure.Persistance.Configurations
 
             builder.Property(x => x.ActualWeight)
                .IsRequired(false);
-
-            builder.HasOne(x => x.CustomerProduct)
-                .WithMany()
-                .HasForeignKey(x => x.CustomerProductId)
-                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
