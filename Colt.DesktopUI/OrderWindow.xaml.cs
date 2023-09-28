@@ -123,7 +123,7 @@ namespace Colt.DesktopUI
             {
                 var item = (OrderProductDto)e.Row.Item;
                 var textBox = e.EditingElement as TextBox;
-                var value = decimal.Parse(textBox.Text);
+                var value = !string.IsNullOrEmpty(textBox.Text) ? decimal.Parse(textBox.Text) : 0;
 
                 item.TotalPrice = item.ProductPrice * value;
 
