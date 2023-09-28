@@ -204,5 +204,12 @@ namespace Colt.DesktopUI
 
             await PopulateCustomerOrdersAsync(_customerDto.Id.Value);
         }
+
+        private void ButtonPrintCustomerOrder_OnClick(object sender, RoutedEventArgs e)
+        {
+            var orderDto = ((FrameworkElement)sender).DataContext as OrderDto;
+
+            _mainWindow.PrintOrder(orderDto.Id.Value);
+        }
     }
 }

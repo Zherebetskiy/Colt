@@ -179,18 +179,22 @@ namespace Colt.DesktopUI
         {
             var orderDto = ((FrameworkElement)sender).DataContext as OrderDto;
 
+            PrintOrder(orderDto.Id.Value);
+        }
+
+        public void PrintOrder(int orderId)
+        {
             var documentService = _serviceProvider.GetRequiredService<IDocumentService>();
 
             Task.Run(async () =>
             {
-                var documentName = await documentService.CreateInvoiceAsync(orderDto.Id.Value);
+                var documentName = await documentService.CreateInvoiceAsync(orderId);
 
                 await Dispatcher.BeginInvoke(() =>
                 {
                     MessageBox.Show($"Invoice {documentName} successfully created.", "Document", MessageBoxButton.OK, MessageBoxImage.Information);
                 });
             });
-
         }
 
         #endregion
