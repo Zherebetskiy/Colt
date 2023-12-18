@@ -21,5 +21,7 @@ namespace Colt.Application.Common.Models
         public double? TotalWeight { get; set; }
 
         public decimal? TotalPrice { get; set; }
+
+        public bool CanDeliver => Status != OrderStatus.Delivered;
     }
 }

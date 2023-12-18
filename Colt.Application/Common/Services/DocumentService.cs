@@ -17,25 +17,22 @@ namespace Colt.Application.Common.Services
 
         public async Task<string> CreateInvoiceAsync(int orderId)
         {
-            try
-            {
-                var order = await _orderService.GetByIdWithCustomerAsync(orderId, CancellationToken.None);
+            var order = await _orderService.GetByIdWithCustomerAsync(orderId, CancellationToken.None);
 
-                var docName = $"{order.CustomerName} - {order.OrderDate:dd.MMM yyyy}.docx";
-                string inputPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources", "InvoiceTemplate.docx");
-                var outputPath = $"C:\\Users\\zhere\\OneDrive\\Робочий стіл\\Invoices\\{docName}";
+            var docName = $"{order.CustomerName} - {order.Id}.docx";
+            string inputPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources", "InvoiceTemplate.docx");
 
-                ProcessFile(order, inputPath, outputPath);
+            var outputPath = $"C:\\Users\\zhere\\OneDrive\\Робочий стіл\\Invoices\\{order.DeliveryDate:dd.MMM yyyy}";
 
-                return docName;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            if (!Directory.Exists(outputPath))
+                Directory.CreateDirectory(outputPath);
+
+            ProcessFile(order, inputPath, outputPath, docName);
+
+            return docName;
         }
 
-        private void ProcessFile(OrderDto order, string inputPath, string outputPath)
+        private void ProcessFile(OrderDto order, string inputPath, string outputPath, string fileName)
         {
             var doc = new GcWordDocument();
             doc.Load(inputPath);
@@ -44,9 +41,11 @@ namespace Colt.Application.Common.Services
 
             doc.DataTemplate.Process();
 
-            doc.Save(outputPath);
+            var filePath = Path.Combine(outputPath, fileName);
 
-            RemoveParagraph(outputPath);
+            doc.Save(filePath);
+
+            RemoveParagraph(filePath);
         }
 
         private void RemoveParagraph(string outputPath)

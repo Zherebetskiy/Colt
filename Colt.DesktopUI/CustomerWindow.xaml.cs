@@ -1,6 +1,8 @@
 ﻿using Colt.Application.Common.Models;
+using Colt.Application.Common.Services;
 using Colt.Application.Interfaces;
 using Colt.Domain.Entities;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -107,7 +109,18 @@ namespace Colt.DesktopUI
         {
             var order = ((FrameworkElement)sender).DataContext as OrderDto;
 
-            Task.Run(() => DeleteCustomerOrderAsync(order?.Id ?? default));
+            MessageBoxResult result = MessageBox.Show($"Do you want to delete order with Id:{order.Id}?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    {
+                        Task.Run(() => DeleteCustomerOrderAsync(order?.Id ?? default));
+
+                        break;
+                    }
+                case MessageBoxResult.No:
+                    break;
+            }
         }
 
         private void ButtonCancel_OnClick(object sender, RoutedEventArgs e)
@@ -210,6 +223,19 @@ namespace Colt.DesktopUI
             var orderDto = ((FrameworkElement)sender).DataContext as OrderDto;
 
             _mainWindow.PrintOrder(orderDto.Id.Value);
+        }
+
+        private void ButtonDeliverOrder_OnClick(object sender, RoutedEventArgs e)
+        {
+            var orderDto = ((FrameworkElement)sender).DataContext as OrderDto;
+
+            Task.Run(async () =>
+            {
+                await _serviceProvider.GetRequiredService<IOrderService>()
+                .DeliverAsync(orderDto.Id.Value, CancellationToken.None);
+
+                await PopulateCustomerOrdersAsync(_customerDto.Id.Value);
+            });
         }
     }
 }

@@ -74,7 +74,7 @@ namespace Colt.Application.Common.Services
 
             RecalculateTotals(order);
 
-            if (order.TotalPrice.HasValue && order.TotalPrice != default)
+            if (order.TotalPrice.HasValue && order.TotalPrice != 0)
             {
                 order.Status = OrderStatus.Calculated;
             }
@@ -108,7 +108,33 @@ namespace Colt.Application.Common.Services
 
             RecalculateTotals(order);
 
+            if (order.TotalPrice.HasValue && order.TotalPrice != 0)
+            {
+                order.Status = OrderStatus.Calculated;
+            }
+
             order.DeliveryDate = orderDto.DeliveryDate;
+
+            await _orderRepository.UpdateAsync(order, cancellationToken);
+
+            return _mapper.Map<OrderDto>(order);
+        }
+
+        public async Task<OrderDto> DeliverAsync(int orderId, CancellationToken cancellationToken)
+        {
+            var order = await _orderRepository.GetByIdAsync(orderId, cancellationToken);
+
+            if (order == null)
+            {
+                throw new ValidationException($"Order not found");
+            }
+
+            if (order.Status != OrderStatus.Calculated)
+            {
+                throw new ValidationException($"Can't deliver not calculated order");
+            }
+
+            order.Status = OrderStatus.Delivered;
 
             await _orderRepository.UpdateAsync(order, cancellationToken);
 
@@ -132,11 +158,11 @@ namespace Colt.Application.Common.Services
         private void RecalculateTotals(Order order)
         {
             order.TotalWeight = order.Products
-                .Where(x => x.ActualWeight.HasValue && x.ActualWeight != default)
+                .Where(x => x.ActualWeight.HasValue)
                 .Sum(x => x.ActualWeight);
 
             order.TotalPrice = order.Products
-                .Where(x => x.TotalPrice.HasValue && x.TotalPrice != default)
+                .Where(x => x.TotalPrice.HasValue)
                 .Sum(x => x.TotalPrice);
         }
     }

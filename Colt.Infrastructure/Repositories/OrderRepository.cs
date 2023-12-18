@@ -40,6 +40,7 @@ namespace Colt.Infrastructure.Repositories
         {
             return _dbSet
                 .Include(x => x.Customer)
+                .OrderByDescending(x => x.DeliveryDate)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
@@ -48,6 +49,7 @@ namespace Colt.Infrastructure.Repositories
         {
             return _dbSet
                 .Where(x => x.CustomerId == customerId)
+                .OrderByDescending(x => x.DeliveryDate)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }

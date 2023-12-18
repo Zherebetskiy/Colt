@@ -4,8 +4,6 @@ namespace Colt.Application.Interfaces
 {
     public interface ICustomerService
     {
-        List<CustomerProductDto> GetProducts(int id);
-
         Task<List<CustomerProductDto>> GetProductsAsync(int id, CancellationToken cancellationToken);
 
         Task<CustomerDto> GetByIdAsync(int id, CancellationToken cancellationToken);

@@ -31,6 +31,10 @@
             <TextBox  Name="txtId" Visibility="Hidden"/>
             <TextBox  Name="txtCustomerId" Visibility="Hidden"/>
             <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Name="txtCustomerName">CustomerName</TextBlock>
+
+            <TextBlock Grid.Row="3" Grid.Column="0">Status</TextBlock>
+            <TextBlock Grid.Row="3" Grid.Column="1" Name="txtOrderStatus" Grid.ColumnSpan="2"></TextBlock>
+
             <TextBlock Grid.Row="1" Grid.Column="3">OrderDate</TextBlock>
             <TextBlock Grid.Row="1" Grid.Column="4" Name="txtOrderDate" Grid.ColumnSpan="2">OrderDate</TextBlock>
             

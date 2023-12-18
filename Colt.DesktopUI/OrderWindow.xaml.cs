@@ -81,8 +81,8 @@ namespace Colt.DesktopUI
 
             if (!orderId.HasValue)
             {
-                var products = _serviceProvider.GetRequiredService<ICustomerService>()
-                    .GetProducts(customerId)
+                var products = (await _serviceProvider.GetRequiredService<ICustomerService>()
+                    .GetProductsAsync(customerId, CancellationToken.None))
                     .Select(x => new OrderProductDto
                     {
                         CustomerProductId = x.Id.Value,
@@ -110,6 +110,7 @@ namespace Colt.DesktopUI
                 txtOrderTotalPrice.Text = _order.TotalPrice.HasValue ? _order.TotalPrice.Value.ToString("N0") : string.Empty;
                 txtOrderDate.Text = _order.OrderDate.ToString(Thread.CurrentThread.CurrentCulture);
                 txtDeliveryDate.Text = _order.DeliveryDate.ToString(Thread.CurrentThread.CurrentCulture);
+                txtOrderStatus.Text = _order.Status.ToString();
 
                 _orderProducts.AddRange(_order.Products);    
             }

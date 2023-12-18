@@ -27,13 +27,6 @@ namespace Colt.Application.Common.Services
             return _mapper.Map<List<CustomerProductDto>>(customerProducts);
         }
 
-        public List<CustomerProductDto> GetProducts(int id)
-        {
-            var customerProducts = _repository.GetProductsByCustomerId(id);
-
-            return _mapper.Map<List<CustomerProductDto>>(customerProducts);
-        }
-
         public async Task<CustomerDto> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             var customer = await _repository.GetByIdAsync(id, cancellationToken);

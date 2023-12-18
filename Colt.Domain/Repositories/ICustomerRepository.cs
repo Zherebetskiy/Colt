@@ -12,9 +12,5 @@ namespace Colt.Domain.Repositories
         Task<List<CustomerProduct>> GetProductsByIdAsync(int productId, CancellationToken cancellationToken);
 
         Task<List<CustomerProduct>> GetProductsByCustomerIdAsync(int id, CancellationToken cancellationToken);
-
-        List<CustomerProduct> GetProductsByCustomerId(int id);
-
-        Customer GetById(int id);
     }
 }

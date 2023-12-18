@@ -17,16 +17,6 @@ namespace Colt.Infrastructure.Repositories
             _dbSet = _dbContext.GetSet<Customer>();
         }
 
-        public Customer GetById(int id)
-        {
-            return _dbSet
-                .Where(x => x.Id == id)
-                .Include(x => x.Products)
-                .Include(x => x.Orders)
-                .AsNoTracking()
-                .FirstOrDefault();
-        }
-
         public Task<Customer> GetWithProductsAsync(int id, CancellationToken cancellationToken)
         {
             return _dbSet
@@ -60,15 +50,6 @@ namespace Colt.Infrastructure.Repositories
                 .Include(x => x.Product)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
-        }
-
-        public List<CustomerProduct> GetProductsByCustomerId(int id)
-        {
-            return _dbContext.GetSet<CustomerProduct>()
-                .Where(x => x.CustomerId == id)
-                .Include(x => x.Product)
-                .AsNoTracking()
-                .ToList();
         }
     }
 }

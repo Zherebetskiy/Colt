@@ -66,12 +66,24 @@ namespace Colt.DesktopUI
         {
             var productDto = ((FrameworkElement)sender).DataContext as ProductDto;
 
-            await _mediator.Send(new DeleteProductCommand
+            MessageBoxResult result = MessageBox.Show($"Do you want to delete product {productDto.Name}?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            switch (result)
             {
-                Id = productDto.Id ?? 0
-            }, CancellationToken.None);
+                case MessageBoxResult.Yes:
+                    {
+                        await _mediator.Send(new DeleteProductCommand
+                        {
+                            Id = productDto.Id ?? 0
+                        }, CancellationToken.None);
 
-            await PopulateProductsGrids();
+                        await PopulateProductsGrids();
+
+
+                        break;
+                    }
+                case MessageBoxResult.No:
+                    break;
+            }
         }
 
         private void ButtonCreateProduct_OnClick(object sender, RoutedEventArgs e)
@@ -111,10 +123,21 @@ namespace Colt.DesktopUI
         {
             var customer = ((FrameworkElement)sender).DataContext as CustomerDto;
 
-            await _serviceProvider.GetRequiredService<ICustomerService>()
-                .DeleteAsync(customer.Id ?? default, CancellationToken.None);
+            MessageBoxResult result = MessageBox.Show($"Do you want to delete customer {customer.Name}?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    {
+                        await _serviceProvider.GetRequiredService<ICustomerService>()
+                            .DeleteAsync(customer.Id ?? default, CancellationToken.None);
 
-            await PopulateCustomersGrids();
+                        await PopulateCustomersGrids();
+
+                        break;
+                    }
+                case MessageBoxResult.No:
+                    break;
+            }
         }
 
         public async Task PopulateCustomersGrids()
@@ -127,7 +150,7 @@ namespace Colt.DesktopUI
 
         #endregion
 
-        #region
+        #region Order
 
         private void ButtonEditOrder_OnClick(object sender, RoutedEventArgs e)
         {
@@ -145,13 +168,13 @@ namespace Colt.DesktopUI
 
         private async void ButtonDeleteOrder_OnClick(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Do you want to delete order?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var order = ((FrameworkElement)sender).DataContext as OrderDto;
+
+            MessageBoxResult result = MessageBox.Show($"Do you want to delete order with Id:{order.Id}?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
             switch (result)
             {
                 case MessageBoxResult.Yes:
                     {
-                        var order = ((FrameworkElement)sender).DataContext as OrderDto;
-
                         await _orderService.DeleteAsync(order.Id ?? default, CancellationToken.None);
 
                         await PopulateOrdersGrids();
@@ -194,6 +217,19 @@ namespace Colt.DesktopUI
                 {
                     MessageBox.Show($"Invoice {documentName} successfully created.", "Document", MessageBoxButton.OK, MessageBoxImage.Information);
                 });
+            });
+        }
+
+        private void ButtonDeliverOrder_OnClick(object sender, RoutedEventArgs e)
+        {
+            var orderDto = ((FrameworkElement)sender).DataContext as OrderDto;
+
+            Task.Run(async () =>
+            {
+                await _serviceProvider.GetRequiredService<IOrderService>()
+                .DeliverAsync(orderDto.Id.Value, CancellationToken.None);
+
+                await PopulateOrdersGrids();
             });
         }
 

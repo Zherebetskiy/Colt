@@ -44,7 +44,7 @@
             </ComboBox>
 
             <DataGrid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="6" x:Name="DataGridCustomerProducts" AutoGenerateColumns="False" 
-                      CanUserAddRows="False" MaxHeight="300" Margin ="0 10 0 10">
+                      CanUserAddRows="False"  MaxHeight="300"  Margin ="0 10 0 10">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Visibility="Hidden"/>
                     <DataGridTextColumn Header="ProductId" Binding="{Binding Path=ProductId}" Visibility="Hidden"/>
@@ -58,14 +58,14 @@
 
             <Button Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Content="Add new order" Width="200" HorizontalAlignment="Left" Click="ButtonCreateCustomerOrder_OnClick" Name="addOrderButton"/>
             <DataGrid Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="6" x:Name="DataGridCustomerOrders" AutoGenerateColumns="False"
-                      CanUserAddRows="False" MaxHeight="300" Margin ="0 10 0 10">
+                      CanUserAddRows="False" Margin ="0 10 0 10">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Visibility="Hidden"/>
-                    <DataGridTextColumn Header="OrderDate" Binding="{Binding Path=OrderDate, StringFormat=\{0:dd.MMM yyyy\}}" Width="*"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="TotalPrice" Binding="{Binding Path=TotalPrice}" Width="*"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="DeliveryDate" Binding="{Binding Path=DeliveryDate, StringFormat=\{0:dd.MMM yyyy\}}" Width="*"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="TotalWeight" Binding="{Binding Path=TotalWeight}" Width="*"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Status" Binding="{Binding Path=Status}" Width="*"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Path=Id}" Width="1*"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="OrderDate" Binding="{Binding Path=OrderDate, StringFormat=\{0:dd.MMM yyyy\}}" Width="2*"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="TotalPrice" Binding="{Binding Path=TotalPrice}" Width="2*"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="TotalWeight" Binding="{Binding Path=TotalWeight}" Width="2*"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Path=Status}" Width="2*"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="DeliveryDate" Binding="{Binding Path=DeliveryDate, StringFormat=\{0:dd.MMM yyyy\}}" Width="2*"  IsReadOnly="True"/>
                     <DataGridTemplateColumn Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -90,7 +90,20 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Deviver" x:Name="ButtonDeliverOrder"
+                                            Click="ButtonDeliverOrder_OnClick" IsEnabled="{Binding Path=CanDeliver}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
+
+                <DataGrid.MaxHeight>
+                    <Binding Path="ActualHeight" 
+                         RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                </DataGrid.MaxHeight>
             </DataGrid>
 
         </Grid>
